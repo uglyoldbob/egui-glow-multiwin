@@ -1,6 +1,4 @@
-use glutin::{
-    event_loop::{ControlFlow, EventLoop},
-};
+use glutin::event_loop::{ControlFlow, EventLoop};
 
 use crate::tracked_window::{DisplayCreationError, TrackedWindowContainer};
 use crate::windows::MyWindows;

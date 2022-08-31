@@ -1,9 +1,6 @@
 use crate::tracked_window::TrackedWindowResponse;
 use crate::{
-    multi_window::NewWindowRequest,
-    tracked_window::{
-        TrackedWindow,
-    },
+    multi_window::NewWindowRequest, tracked_window::TrackedWindow,
     windows::popup_window::PopupWindow,
 };
 use egui_glow::EguiGlow;
@@ -40,8 +37,11 @@ impl TrackedWindow for RootWindow {
         self.root
     }
 
-    fn redraw(&mut self, egui: &mut EguiGlow,
-        _gl_window: &mut glutin::WindowedContext<PossiblyCurrent>) -> TrackedWindowResponse {
+    fn redraw(
+        &mut self,
+        egui: &mut EguiGlow,
+        _gl_window: &mut glutin::WindowedContext<PossiblyCurrent>,
+    ) -> TrackedWindowResponse {
         let mut quit = false;
 
         let mut windows_to_create = Vec::new();

@@ -1,4 +1,4 @@
-use crate::tracked_window::{TrackedWindow, TrackedWindowControl,TrackedWindowResponse};
+use crate::tracked_window::{TrackedWindow, TrackedWindowControl, TrackedWindowResponse};
 use egui_glow::EguiGlow;
 use glutin::PossiblyCurrent;
 

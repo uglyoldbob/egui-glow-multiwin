@@ -1,8 +1,6 @@
 use crate::{
     multi_window::NewWindowRequest,
-    tracked_window::{
-        TrackedWindow, TrackedWindowResponse,
-    },
+    tracked_window::{TrackedWindow, TrackedWindowResponse},
 };
 use egui_glow::EguiGlow;
 use glutin::PossiblyCurrent;
@@ -30,29 +28,31 @@ impl PopupWindow {
 }
 
 impl TrackedWindow for PopupWindow {
+    fn redraw(
+        &mut self,
+        egui: &mut EguiGlow,
+        _gl_window: &mut glutin::WindowedContext<PossiblyCurrent>,
+    ) -> TrackedWindowResponse {
+        let mut quit = false;
 
-    fn redraw(&mut self, egui: &mut EguiGlow,
-        _gl_window: &mut glutin::WindowedContext<PossiblyCurrent>) -> TrackedWindowResponse{
-            let mut quit = false;
-
-            egui::CentralPanel::default().show(&egui.egui_ctx, |ui| {
-                if ui.button("Increment").clicked() {
-                    //TODO
-                }
-                let response = ui.add(egui::TextEdit::singleline(&mut self.input));
-                if response.changed() {
-                    // …
-                }
-                if response.lost_focus() && ui.input().key_pressed(egui::Key::Enter) {
-                    // …
-                }
-                if ui.button("Quit").clicked() {
-                    quit = true;
-                }
-            });
-            TrackedWindowResponse {
-                quit: quit,
-                new_windows: Vec::new(),
+        egui::CentralPanel::default().show(&egui.egui_ctx, |ui| {
+            if ui.button("Increment").clicked() {
+                //TODO
             }
+            let response = ui.add(egui::TextEdit::singleline(&mut self.input));
+            if response.changed() {
+                // …
+            }
+            if response.lost_focus() && ui.input().key_pressed(egui::Key::Enter) {
+                // …
+            }
+            if ui.button("Quit").clicked() {
+                quit = true;
+            }
+        });
+        TrackedWindowResponse {
+            quit: quit,
+            new_windows: Vec::new(),
         }
+    }
 }

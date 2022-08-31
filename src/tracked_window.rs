@@ -1,9 +1,6 @@
 use std::{mem, sync::Arc};
 
-use crate::{
-    multi_window::NewWindowRequest,
-    windows::MyWindows,
-};
+use crate::{multi_window::NewWindowRequest, windows::MyWindows};
 use egui_glow::EguiGlow;
 use glutin::{
     event::Event,
@@ -22,7 +19,9 @@ pub struct TrackedWindowResponse {
 #[enum_dispatch]
 pub trait TrackedWindow {
     /// Returns true if the window is a root window. Root windows will close all other windows when closed
-    fn is_root(&self) -> bool { false }
+    fn is_root(&self) -> bool {
+        false
+    }
 
     /// Sets whether or not the window is a root window.
     fn set_root(&mut self, _root: bool) {}
@@ -129,13 +128,20 @@ pub trait TrackedWindow {
 
         TrackedWindowControl {
             requested_control_flow: control_flow,
-            windows_to_create: if let Some(r) = response { r.new_windows } else { Vec::new() },
-            }
+            windows_to_create: if let Some(r) = response {
+                r.new_windows
+            } else {
+                Vec::new()
+            },
+        }
     }
 
     /// Runs the redraw for the window
-    fn redraw(&mut self, egui: &mut EguiGlow,
-        gl_window: &mut glutin::WindowedContext<PossiblyCurrent>) -> TrackedWindowResponse;
+    fn redraw(
+        &mut self,
+        egui: &mut EguiGlow,
+        gl_window: &mut glutin::WindowedContext<PossiblyCurrent>,
+    ) -> TrackedWindowResponse;
 }
 
 pub struct TrackedWindowContainer {
