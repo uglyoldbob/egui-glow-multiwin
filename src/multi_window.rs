@@ -1,6 +1,5 @@
 use glutin::{
     event_loop::{ControlFlow, EventLoop},
-    platform::run_return::EventLoopExtRunReturn,
 };
 
 use crate::tracked_window::{DisplayCreationError, TrackedWindowContainer};
@@ -54,7 +53,7 @@ impl MultiWindow {
                     }
 
                     for new_window_request in window_control.windows_to_create {
-                        multi_window.add(new_window_request, event_loop_window_target);
+                        let _e = multi_window.add(new_window_request, event_loop_window_target);
 
                     }
                 }
@@ -91,36 +90,11 @@ impl MultiWindow {
                                 *flow = ControlFlow::WaitUntil(when_new);
                             }
                         },
-                        ControlFlow::ExitWithCode(n) => (),
                         ControlFlow::Exit => (), // handle differently, only exit if all windows are gone?? what do about a closed root window
+                        ControlFlow::ExitWithCode(_n) => (),
                     }
                 }
             }
-
-            // for window in &mut self.windows {
-            //     if window.is_event_for_window(&event){
-            //         match window.handle_event_outer(&event, vec![]) {
-            //             Some(ControlFlow::Exit) => {
-            //                 *flow = ControlFlow::Exit
-            //             },
-            //             Some(_) => (),
-            //             None => ()
-            //         }
-            //     }
-            // }
-
-
-            // for option in &mut self.windows {
-            //     if let Some(window) = option.as_mut() {
-            //         match window.handle_event_outer(&event) {
-            //             Some(ControlFlow::Exit) => {
-            //                 *flow = ControlFlow::Exit
-            //             },
-            //             Some(_) => (),
-            //             None => ()
-            //         }
-            //     }
-            // }
 
             if multi_window.windows.is_empty() {
                 println!("no more windows running, exiting event loop.");

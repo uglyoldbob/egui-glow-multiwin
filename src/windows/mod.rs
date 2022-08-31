@@ -1,8 +1,6 @@
-use crate::tracked_window::{TrackedWindow, TrackedWindowControl};
-use crate::MultiWindow;
+use crate::tracked_window::{TrackedWindow, TrackedWindowControl,TrackedWindowResponse};
 use egui_glow::EguiGlow;
-use glutin::{event_loop::ControlFlow, PossiblyCurrent};
-use std::sync::Arc;
+use glutin::PossiblyCurrent;
 
 pub mod popup_window;
 pub mod root;

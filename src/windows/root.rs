@@ -1,15 +1,13 @@
-use crate::MultiWindow;
+use crate::tracked_window::TrackedWindowResponse;
 use crate::{
     multi_window::NewWindowRequest,
     tracked_window::{
-        DisplayCreationError, TrackedWindow, TrackedWindowContainer, TrackedWindowControl,
+        TrackedWindow,
     },
     windows::popup_window::PopupWindow,
 };
 use egui_glow::EguiGlow;
-use glutin::{event_loop::ControlFlow, PossiblyCurrent};
-
-use crate::windows::MyWindows;
+use glutin::PossiblyCurrent;
 
 pub struct RootWindow {
     pub button_press_count: u32,
@@ -43,18 +41,18 @@ impl TrackedWindow for RootWindow {
     }
 
     fn redraw(&mut self, egui: &mut EguiGlow,
-        gl_window: &mut glutin::WindowedContext<PossiblyCurrent>) {
+        _gl_window: &mut glutin::WindowedContext<PossiblyCurrent>) -> TrackedWindowResponse {
         let mut quit = false;
+
+        let mut windows_to_create = Vec::new();
 
         egui::SidePanel::left("my_side_panel").show(&egui.egui_ctx, |ui| {
             ui.heading("Hello World!");
             if ui.button("New popup").clicked() {
-                /*
                 windows_to_create.push(PopupWindow::new(format!(
                     "popup window #{}",
                     self.num_popups_created
                 )));
-                */
                 self.num_popups_created += 1;
             }
             if ui.button("Quit").clicked() {
@@ -74,5 +72,9 @@ impl TrackedWindow for RootWindow {
                 }
             }*/
         });
+        TrackedWindowResponse {
+            quit: quit,
+            new_windows: windows_to_create,
+        }
     }
 }

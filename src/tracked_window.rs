@@ -1,7 +1,7 @@
 use std::{mem, sync::Arc};
 
 use crate::{
-    multi_window::{MultiWindow, NewWindowRequest},
+    multi_window::NewWindowRequest,
     windows::MyWindows,
 };
 use egui_glow::EguiGlow;
@@ -11,6 +11,11 @@ use glutin::{
     PossiblyCurrent,
 };
 use thiserror::Error;
+
+pub struct TrackedWindowResponse {
+    pub quit: bool,
+    pub new_windows: Vec<NewWindowRequest>,
+}
 
 /// A window being tracked by a `MultiWindow`. All tracked windows will be forwarded all events
 /// received on the `MultiWindow`'s event loop.
@@ -48,12 +53,11 @@ pub trait TrackedWindow {
             let ppp = input.pixels_per_point;
             egui.egui_ctx.begin_frame(input);
 
-            let quit = false;
-            self.redraw(egui, gl_window);
+            let rr = self.redraw(egui, gl_window);
 
             let full_output = egui.egui_ctx.end_frame();
 
-            if quit {
+            if rr.quit {
                 control_flow = glutin::event_loop::ControlFlow::Exit;
             } else if full_output.repaint_after.is_zero() {
                 gl_window.window().request_redraw();
@@ -86,14 +90,15 @@ pub trait TrackedWindow {
 
                 gl_window.swap_buffers().unwrap();
             }
+            rr
         };
 
-        match event {
+        let response = match event {
             // Platform-dependent event handlers to workaround a winit bug
             // See: https://github.com/rust-windowing/winit/issues/987
             // See: https://github.com/rust-windowing/winit/issues/1619
-            glutin::event::Event::RedrawEventsCleared if cfg!(windows) => redraw(),
-            glutin::event::Event::RedrawRequested(_) if !cfg!(windows) => redraw(),
+            glutin::event::Event::RedrawEventsCleared if cfg!(windows) => Some(redraw()),
+            glutin::event::Event::RedrawRequested(_) if !cfg!(windows) => Some(redraw()),
 
             glutin::event::Event::WindowEvent { event, .. } => {
                 if let glutin::event::WindowEvent::Resized(physical_size) = event {
@@ -107,13 +112,15 @@ pub trait TrackedWindow {
                 egui.on_event(event);
 
                 gl_window.window().request_redraw(); // TODO: ask egui if the events warrants a repaint instead
+                None
             }
             glutin::event::Event::LoopDestroyed => {
                 egui.destroy();
+                None
             }
 
-            _ => (),
-        }
+            _ => None,
+        };
 
         if !root_window_exists && !self.is_root() {
             println!("Root window is gone, exiting popup.");
@@ -122,13 +129,13 @@ pub trait TrackedWindow {
 
         TrackedWindowControl {
             requested_control_flow: control_flow,
-            windows_to_create: vec![],
-        }
+            windows_to_create: if let Some(r) = response { r.new_windows } else { Vec::new() },
+            }
     }
 
     /// Runs the redraw for the window
     fn redraw(&mut self, egui: &mut EguiGlow,
-        gl_window: &mut glutin::WindowedContext<PossiblyCurrent>);
+        gl_window: &mut glutin::WindowedContext<PossiblyCurrent>) -> TrackedWindowResponse;
 }
 
 pub struct TrackedWindowContainer {
@@ -222,9 +229,6 @@ impl TrackedWindowContainer {
                 self.egui = Some(egui);
             }
             Some(_) => (),
-            _ => {
-                panic!("Partially initialized window");
-            }
         };
 
         let result = match self.egui.as_mut() {

@@ -1,13 +1,11 @@
 use crate::{
-    multi_window::{MultiWindow, NewWindowRequest},
+    multi_window::NewWindowRequest,
     tracked_window::{
-        DisplayCreationError, TrackedWindow, TrackedWindowContainer, TrackedWindowControl,
+        TrackedWindow, TrackedWindowResponse,
     },
 };
 use egui_glow::EguiGlow;
-use glutin::{event_loop::ControlFlow, PossiblyCurrent};
-
-use crate::windows::MyWindows;
+use glutin::PossiblyCurrent;
 
 pub struct PopupWindow {
     pub input: String,
@@ -34,7 +32,7 @@ impl PopupWindow {
 impl TrackedWindow for PopupWindow {
 
     fn redraw(&mut self, egui: &mut EguiGlow,
-        gl_window: &mut glutin::WindowedContext<PossiblyCurrent>) {
+        _gl_window: &mut glutin::WindowedContext<PossiblyCurrent>) -> TrackedWindowResponse{
             let mut quit = false;
 
             egui::CentralPanel::default().show(&egui.egui_ctx, |ui| {
@@ -52,5 +50,9 @@ impl TrackedWindow for PopupWindow {
                     quit = true;
                 }
             });
+            TrackedWindowResponse {
+                quit: quit,
+                new_windows: Vec::new(),
+            }
         }
 }
